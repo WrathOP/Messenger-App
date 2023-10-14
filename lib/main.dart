@@ -1,43 +1,45 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'package:chat_app/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:messenger/View/splash/splash_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import './screens/chat_screen.dart';
+import './screens/auth_screen.dart';
+
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  Firebase.initializeApp();
-  runApp(const MyApp());
+  runApp(MyApp());
 }
+
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
+    return MaterialApp(
+      title: 'Chat app',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primarySwatch: Colors.red,
+        backgroundColor: Colors.red,
+        accentColor: Colors.redAccent,
+        accentColorBrightness: Brightness.dark,
+        buttonTheme: ButtonTheme.of(context).copyWith(
+          buttonColor: Colors.red,
+          textTheme: ButtonTextTheme.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+        ),
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const SplashScreen()
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.onAuthStateChanged,
+        builder: (context, userSnapshot) {
+          if (userSnapshot.connectionState == ConnectionState.waiting) {
+            return SplashScreen();
+          }
+          if (userSnapshot.hasData) {
+            return ChatScreen();
+          }
+          return AuthScreen();
+        },
+      ),
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
